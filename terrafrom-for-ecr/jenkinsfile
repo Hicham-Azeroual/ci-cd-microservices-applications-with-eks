@@ -19,25 +19,33 @@ pipeline {
 
         stage('Terraform version') {
             steps {
-                sh 'terraform --version'
+                dir('terrafrom-for-ecr') {
+                    sh 'terraform --version'
+                }
             }
         }
 
         stage('Terraform init') {
             steps {
-                sh 'terraform init --reconfigure'
+                dir('terrafrom-for-ecr') {
+                    sh 'terraform init --reconfigure'
+                }
             }
         }
 
         stage('Terraform validate') {
             steps {
-                sh 'terraform validate'
+                dir('terrafrom-for-ecr') {
+                    sh 'terraform validate'
+                }
             }
         }
 
         stage('Terraform plan') {
             steps {
-                sh 'terraform plan'
+                dir('terrafrom-for-ecr') {
+                    sh 'terraform plan'
+                }
             }
         }
 
@@ -46,7 +54,9 @@ pipeline {
                 expression { params.ACTION == 'apply' }
             }
             steps {
-                sh 'terraform apply -auto-approve'
+                dir('terrafrom-for-ecr') {
+                    sh 'terraform apply -auto-approve'
+                }
             }
         }
 
@@ -55,7 +65,9 @@ pipeline {
                 expression { params.ACTION == 'destroy' }
             }
             steps {
-                sh 'terraform destroy -auto-approve'
+                dir('terrafrom-for-ecr') {
+                    sh 'terraform destroy -auto-approve'
+                }
             }
         }
     }
