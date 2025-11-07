@@ -97,8 +97,6 @@ pipeline {
             }
         }
     }
-}
-
     post {
         always {
             dir('src/adservice') {
@@ -126,3 +124,4 @@ pipeline {
             }
         }
     }
+}
