@@ -10,3 +10,17 @@ override.tf.json
 *_override.tf.json
 .terraformrc
 terraform.rc
+
+# Java/Gradle
+.gradle/
+build/
+.idea/
+.project
+.classpath
+.settings/
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.log
