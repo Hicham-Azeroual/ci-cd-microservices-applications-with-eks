@@ -19,6 +19,16 @@ WORKDIR /app
 COPY ["build.gradle", "gradlew", "./"]
 COPY gradle gradle
 RUN chmod +x gradlew
+
+// Download and place gradle-wrapper.jar
+RUN distributionUrl=$(grep 'distributionUrl' gradle/wrapper/gradle-wrapper.properties | cut -d'=' -f2) &amp;&amp; \
+    version=$(echo $distributionUrl | sed -e 's/.*gradle-\(.*\)-bin.zip/\1/') &amp;&amp; \
+    wget -q $distributionUrl -O /tmp/gradle.zip &amp;&amp; \
+    unzip -q /tmp/gradle.zip "gradle-$version/lib/gradle-wrapper.jar" -d /tmp &amp;&amp; \
+    mkdir -p gradle/wrapper &amp;&amp; \
+    mv /tmp/gradle-$version/lib/gradle-wrapper.jar gradle/wrapper/ &amp;&amp; \
+    rm -rf /tmp/gradle*
+
 RUN ./gradlew downloadRepos
 
 COPY . .
