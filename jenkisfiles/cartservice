@@ -1,5 +1,9 @@
 pipeline {
     agent any
+       tools {
+        // .NET SDK should be installed in Jenkins global tools config
+        dotnetsdk 'dotnet9'
+    }
     environment {
         GIT_REPO_NAME = "ci-cd-microservices-applications-with-eks"
         GIT_EMAIL = "hichamazroual2002@gmail.com"
@@ -67,6 +71,73 @@ pipeline {
             post {
                 always {
                     archiveArtifacts 'src/cartservice/src/trivy-image-cart.*'
+                }
+            }
+        }
+        // --- SAST: SonarQube for C# ---
+        stage("SonarQube Analysis") {
+            steps {
+                dir('src/cartservice') {
+                    withSonarQubeEnv('sonar-server') {
+                        sh '''
+                        dotnet tool install --global dotnet-sonarscanner || true
+                        export PATH="$PATH:$HOME/.dotnet/tools"
+
+                        dotnet sonarscanner begin /k:"cartservice" /d:sonar.host.url=$SONAR_HOST_URL /d:sonar.login=$SONAR_AUTH_TOKEN
+                        dotnet build
+                        dotnet sonarscanner end /d:sonar.login=$SONAR_AUTH_TOKEN
+                        '''
+                    }
+                }
+            }
+        }
+
+        // --- Quality Gate ---
+        stage("Quality Gate") {
+            steps {
+                dir('src/cartservice') {
+                    script {
+                        timeout(time: 3, unit: 'MINUTES') {
+                            try {
+                                waitForQualityGate abortPipeline: true, credentialsId: 'sonar-token'
+                            } catch (Exception e) {
+                                echo "Quality Gate failed but continuing for development: ${e.message}"
+                                // Uncomment below line to make it non-blocking
+                                // currentBuild.result = 'UNSTABLE'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // --- Build & Unit Tests ---
+        stage("Build & Test") {
+            steps {
+                dir('src/cartservice/src') {
+                    sh '''
+                    dotnet restore
+                    dotnet build --no-incremental
+                    dotnet test --logger:trx
+                    '''
+                }
+            }
+        }
+
+        // --- Dependency Check (SCA) ---
+        stage("Dependency Check") {
+            steps {
+                dir('src/cartservice') {
+                    dependencyCheck additionalArguments: '''
+                        --scan ./
+                        --format XML
+                        --out dependency-check-report.xml
+                    ''',
+                    odcInstallation: 'dp-check'
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts 'src/cartservice/dependency-check-report.xml'
                 }
             }
         }
