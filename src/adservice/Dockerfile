@@ -19,23 +19,13 @@ WORKDIR /app
 COPY ["build.gradle", "gradlew", "./"]
 COPY gradle gradle
 RUN chmod +x gradlew
-
-// Download and place gradle-wrapper.jar
-RUN distributionUrl=$(grep 'distributionUrl' gradle/wrapper/gradle-wrapper.properties | cut -d'=' -f2) &amp;&amp; \
-    version=$(echo $distributionUrl | sed -e 's/.*gradle-\(.*\)-bin.zip/\1/') &amp;&amp; \
-    wget -q $distributionUrl -O /tmp/gradle.zip &amp;&amp; \
-    unzip -q /tmp/gradle.zip "gradle-$version/lib/gradle-wrapper.jar" -d /tmp &amp;&amp; \
-    mkdir -p gradle/wrapper &amp;&amp; \
-    mv /tmp/gradle-$version/lib/gradle-wrapper.jar gradle/wrapper/ &amp;&amp; \
-    rm -rf /tmp/gradle*
-
 RUN ./gradlew downloadRepos
 
 COPY . .
 RUN chmod +x gradlew
 RUN ./gradlew installDist
 
-FROM eclipse-temurin:19.0.1_10-jre-alpine@sha256:a75ea64f676041562cd7d3a54a9764bbfb357b2bf1bebf46e2af73e62d32e36c as without-grpc-health-probe-bin
+FROM eclipse-temurin:19.0.1_10-jre-alpine@sha256:fabe27bd9db502d484a11d3f571c2f4ef7bba4a172527084d939935358fb06c4
 
 RUN apk add --no-cache ca-certificates
 
@@ -50,10 +40,3 @@ COPY --from=builder /app .
 
 EXPOSE 9555
 ENTRYPOINT ["/app/build/install/hipstershop/bin/AdService"]
-
-FROM without-grpc-health-probe-bin
-
-# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
-ENV GRPC_HEALTH_PROBE_VERSION=v0.4.18
-RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-    chmod +x /bin/grpc_health_probe
