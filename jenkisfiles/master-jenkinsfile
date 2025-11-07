@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'GIT_REPO_NAME', defaultValue: 'ci-cd-microservices-applications-with-eks', description: 'Git Repository Name')
+        string(name: 'GIT_BRANCH', defaultValue: 'main', description: 'Git Branch to build from')
+    }
+
+    stages {
+        stage('Build All Microservices') {
+            steps {
+                script {
+                    def services = [
+                        'adservice-pipeline',
+                        'cartservice-pipeline',
+                        'checkoutservice-pipeline',
+                        'currencyservice-pipeline',
+                        'emailservice-pipeline',
+                        'frontend-pipeline',
+                        'loadgenerator-pipeline',
+                        'paymentservice-pipeline',
+                        'productcatalogservice-pipeline',
+                        'recommendationservice-pipeline',
+                        'shippingservice-pipeline'
+                    ]
+
+                    for (int i = 0; i < services.size(); i++) {
+                        def serviceName = services[i]
+                        echo "Building service: ${serviceName}"
+                        build job: serviceName, parameters: [
+                            string(name: 'GIT_REPO_NAME', value: params.GIT_REPO_NAME),
+                            string(name: 'GIT_BRANCH', value: params.GIT_BRANCH)
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
