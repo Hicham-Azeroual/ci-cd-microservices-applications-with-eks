@@ -108,7 +108,6 @@ pipeline {
                         subject: "Pipeline ${buildStatus}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                         body: """
                             <p>Adservice Google-Shop DevSecOps pipeline status.</p>
-                            <p>Youtube Link :- https://www.youtube.com/@devopsHarishNShetty  </p>
                             <p>Project: ${env.JOB_NAME}</p>
                             <p>Build Number: ${env.BUILD_NUMBER}</p>
                             <p>Build Status: ${buildStatus}</p>
