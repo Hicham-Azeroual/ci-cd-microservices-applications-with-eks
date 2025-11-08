@@ -143,7 +143,7 @@ The project utilizes Jenkins for its CI/CD pipelines. Each microservice has its 
 -   **Update Deployment file**: Updates the Kubernetes deployment YAML with the new image version and pushes changes to Git (for ArgoCD).
 
 ## Observability
-The application's observability is powered by:
+The application\'s observability is powered by:
 -   **Prometheus**: Collects metrics from the Kubernetes cluster and applications.
 -   **Grafana**: Visualizes the collected metrics through interactive dashboards.
 -   **Alertmanager**: Manages and sends alerts based on predefined rules (e.g., email notifications for high CPU usage).
@@ -152,20 +152,20 @@ The application's observability is powered by:
 Here are some visual aids to better understand the project:
 
 ### Jenkins Pipeline
-![Jenkins Pipeline 1](images/jenkins-pipeline-1.png)
-![Jenkins Pipeline 2](images/jenkins-pipeline-2.png)
+![Jenkins Pipeline 1](images/jenkins1.png)
+![Jenkins Pipeline 2](images/jenkins2.png)
 
 ### Architecture Diagrams
-![Architecture Diagram 1](images/architecture-diagram-1.png)
-![Architecture Diagram 2](images/architecture-diagram-2.png)
-![Architecture Diagram 3](images/architecture-diagram-3.png)
-![Website Screenshot 1](images/website-screenshot-1.png)
-![Website Screenshot 2](images/website-screenshot-2.png)
+![Architecture Diagram 1](images/architecture.png)
+![Architecture Diagram 2](images/architecture.png)
+![Architecture Diagram 3](images/architecture.png)
+![Website Screenshot 1](images/website.png)
+![Website Screenshot 2](images/website.png)
 
 ### Grafana Dashboards
-![Grafana Dashboard 1](images/grafana-dashboard-1.png)
-![Grafana Dashboard 2](images/grafana-dashboard-2.png)
-![ArgoCD Dashboard](images/argocd-dashboard.png)
+![Grafana Dashboard 1](images/grafana1.png)
+![Grafana Dashboard 2](images/grafana2.png)
+![ArgoCD Dashboard](images/argocd.png)
 
 ## Conclusion
 This project provides a robust foundation for deploying and managing microservices on AWS EKS with a strong emphasis on automation, CI/CD, and observability. By following the detailed steps, you can achieve a production-ready setup for your e-commerce application.
