@@ -152,20 +152,20 @@ The application's observability is powered by:
 Here are some visual aids to better understand the project:
 
 ### Jenkins Pipeline
-![Jenkins Pipeline 1](images/Capture d'écran 2025-11-07 203723.png)
-![Jenkins Pipeline 2](images/Capture d'écran 2025-11-07 204342.png)
+![Jenkins Pipeline 1](images/jenkins-pipeline-1.png)
+![Jenkins Pipeline 2](images/jenkins-pipeline-2.png)
 
 ### Architecture Diagrams
-![Architecture Diagram 1](images/Capture d'écran 2025-11-08 123754.png)
-![Architecture Diagram 2](images/Capture d'écran 2025-11-08 123908.png)
-![Architecture Diagram 3](images/Capture d'écran 2025-11-08 124117.png)
-![Architecture Diagram 4](images/Capture d'écran 2025-11-08 124257.png)
-![Architecture Diagram 5](images/Capture d'écran 2025-11-08 124318.png)
+![Architecture Diagram 1](images/architecture-diagram-1.png)
+![Architecture Diagram 2](images/architecture-diagram-2.png)
+![Architecture Diagram 3](images/architecture-diagram-3.png)
+![Website Screenshot 1](images/website-screenshot-1.png)
+![Website Screenshot 2](images/website-screenshot-2.png)
 
 ### Grafana Dashboards
-![Grafana Dashboard 1](images/Capture d'écran 2025-11-08 125159.png)
-![Grafana Dashboard 2](images/Capture d'écran 2025-11-08 141108.png)
-![Grafana Dashboard 3](images/Capture d'écran 2025-11-08 141225.png)
+![Grafana Dashboard 1](images/grafana-dashboard-1.png)
+![Grafana Dashboard 2](images/grafana-dashboard-2.png)
+![ArgoCD Dashboard](images/argocd-dashboard.png)
 
 ## Conclusion
 This project provides a robust foundation for deploying and managing microservices on AWS EKS with a strong emphasis on automation, CI/CD, and observability. By following the detailed steps, you can achieve a production-ready setup for your e-commerce application.
