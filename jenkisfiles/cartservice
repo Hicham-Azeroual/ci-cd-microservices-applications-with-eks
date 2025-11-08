@@ -164,7 +164,7 @@ stage("Trivy Scan Image") {
             }
         }
     }
-    }
+    
     post {
         always {
             dir('src/cartservice/src') {
