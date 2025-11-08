@@ -157,10 +157,9 @@ Here are some visual aids to better understand the project:
 
 ### Architecture Diagrams
 ![Architecture Diagram 1](images/architecture.png)
-![Architecture Diagram 2](images/architecture.png)
-![Architecture Diagram 3](images/architecture.png)
 ![Website Screenshot 1](images/website.png)
-![Website Screenshot 2](images/website.png)
+![Website Screenshot 1](images/website2.png)
+
 
 ### Grafana Dashboards
 ![Grafana Dashboard 1](images/grafana1.png)
