@@ -39,7 +39,7 @@ pipeline {
             }
         }
 
-        stage("Trivy File Scan") {
+stage("Trivy File Scan") {
             steps {
                 dir('src/cartservice/src') {
                     sh '''
@@ -49,7 +49,7 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts 'trivy-fs-report.txt'
+                    archiveArtifacts 'src/cartservice/src/trivy-fs-report.txt'
                 }
             }
         }
@@ -130,18 +130,18 @@ pipeline {
                 }
             }
         }
-        stage("Trivy Scan Image") {
+stage("Trivy Scan Image") {
             steps {
                 dir('src/cartservice/src') {
                     sh '''
-                        trivy image -f json -o trivy-image-${SERVICE_NAME}.json ${REPO_URL}:${BUILD_NUMBER}
-                        trivy image -f table -o trivy-image-${SERVICE_NAME}.txt ${REPO_URL}:${BUILD_NUMBER}
+                        trivy image -f json -o trivy-image-cart.json ${REPO_URL}:${BUILD_NUMBER}
+                        trivy image -f table -o trivy-image-cart.txt ${REPO_URL}:${BUILD_NUMBER}
                     '''
                 }
             }
             post {
                 always {
-                    archiveArtifacts 'trivy-image-${SERVICE_NAME}.*'
+                    archiveArtifacts 'src/cartservice/src/trivy-image-cart.*'
                 }
             }
         }
@@ -184,7 +184,7 @@ pipeline {
                         to: 'hichamazroual2002@gmail.com',
                         from: 'hichamazroual2002@gmail.com',
                         mimeType: 'text/html',
-                        attachmentsPattern: 'dependency-check-report.xml,trivy-fs-report.txt,trivy-image-${SERVICE_NAME}.json,trivy-image-${SERVICE_NAME}.txt'
+                        attachmentsPattern: 'dependency-check-report.xml,trivy-fs-report.txt,trivy-image-cart.json,trivy-image-cart.txt'
                     )
                 }
             }
