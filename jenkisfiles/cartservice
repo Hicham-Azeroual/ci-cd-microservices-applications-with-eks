@@ -5,11 +5,14 @@ pipeline {
         dotnetsdk 'dotnet9'
     }
     environment {
+        AWS_REGION = "us-east-1"
+        AWS_ACCOUNT_ID = "416684166507"
+        SERVICE_NAME = "cartservice"
         GIT_REPO_NAME = "ci-cd-microservices-applications-with-eks"
         GIT_EMAIL = "hichamazroual2002@gmail.com"
         GIT_USER_NAME = "Hicham-Azeroual"
         IMAGE_NAME = "cartservice"
-        REPO_URL = "416684166507.dkr.ecr.us-east-1.amazonaws.com/cartservice"
+        REPO_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SERVICE_NAME}"
         YAML_FILE = "cartservice.yaml"
     }
     stages {
@@ -23,6 +26,19 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Hicham-Azeroual/ci-cd-microservices-applications-with-eks.git'
             }
         }
+        // --- Build & Unit Tests ---
+        stage("Build & Test") {
+            steps {
+                dir('src/cartservice/src') {
+                    sh '''
+                    dotnet restore
+                    dotnet build --no-incremental
+                    dotnet test --logger:trx
+                    '''
+                }
+            }
+        }
+
         stage("Trivy File Scan") {
             steps {
                 dir('src/cartservice/src') {
@@ -34,43 +50,6 @@ pipeline {
             post {
                 always {
                     archiveArtifacts 'src/cartservice/src/trivy-fs-report.txt'
-                }
-            }
-        }
-        stage("Docker Image Build") {
-            steps {
-                script {
-                    dir('src/cartservice/src') {
-                        sh 'docker system prune -f'
-                        sh 'docker container prune -f'
-                        sh 'docker build -t cartservice .'
-                    }
-                }
-            }
-        }
-        stage("ECR Image Pushing") {
-            steps {
-                script {
-                    sh '''
-                        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 416684166507.dkr.ecr.us-east-1.amazonaws.com
-                        docker tag cartservice:latest 416684166507.dkr.ecr.us-east-1.amazonaws.com/cartservice:${BUILD_NUMBER}
-                        docker push 416684166507.dkr.ecr.us-east-1.amazonaws.com/cartservice:${BUILD_NUMBER}
-                    '''
-                }
-            }
-        }
-        stage("Trivy Scan Image") {
-            steps {
-                dir('src/cartservice/src') {
-                    sh '''
-                        trivy image -f json -o trivy-image-cart.json ${REPO_URL}:${BUILD_NUMBER}
-                        trivy image -f table -o trivy-image-cart.txt ${REPO_URL}:${BUILD_NUMBER}
-                    '''
-                }
-            }
-            post {
-                always {
-                    archiveArtifacts 'src/cartservice/src/trivy-image-cart.*'
                 }
             }
         }
@@ -110,18 +89,6 @@ pipeline {
                 }
             }
         }
-        // --- Build & Unit Tests ---
-        stage("Build & Test") {
-            steps {
-                dir('src/cartservice/src') {
-                    sh '''
-                    dotnet restore
-                    dotnet build --no-incremental
-                    dotnet test --logger:trx
-                    '''
-                }
-            }
-        }
 
         // --- Dependency Check (SCA) ---
         stage("Dependency Check") {
@@ -141,17 +108,55 @@ pipeline {
                 }
             }
         }
+        stage("Docker Image Build") {
+            steps {
+                script {
+                    dir('src/cartservice/src') {
+                        sh 'docker system prune -f'
+                        sh 'docker container prune -f'
+                        sh 'docker build -t ${SERVICE_NAME} .'
+                    }
+                }
+            }
+        }
+        stage("ECR Image Pushing") {
+            steps {
+                script {
+                    sh '''
+                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                        docker tag ${SERVICE_NAME}:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SERVICE_NAME}:${BUILD_NUMBER}
+                        docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SERVICE_NAME}:${BUILD_NUMBER}
+                    '''
+                }
+            }
+        }
+        stage("Trivy Scan Image") {
+            steps {
+                dir('src/cartservice/src') {
+                    sh '''
+                        trivy image -f json -o trivy-image-${SERVICE_NAME}.json ${REPO_URL}:${BUILD_NUMBER}
+                        trivy image -f table -o trivy-image-${SERVICE_NAME}.txt ${REPO_URL}:${BUILD_NUMBER}
+                    '''
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts 'src/cartservice/src/trivy-image-${SERVICE_NAME}.*'
+                }
+            }
+        }
+
         stage('Update Deployment file') {
             steps {
-                dir('kubernetes-files') {
+                dir('k8s') {
                     withCredentials([string(credentialsId: 'my-git-pattoken', variable: 'git_token')]) {
                         sh '''
                             git config user.email "${GIT_EMAIL}"
                             git config user.name "${GIT_USER_NAME}"
                             echo $BUILD_NUMBER
-                            sed -i "s#image:.*#image: ${REPO_URL}:$BUILD_NUMBER#g" ${YAML_FILE}
+                            sed -i "s#image:.*#image: ${REPO_URL}:${BUILD_NUMBER}#g" ${YAML_FILE}
                             git add .
-                            git commit -m "Update ${IMAGE_NAME} Image to version ${BUILD_NUMBER}"
+                            git commit -m "Update ${SERVICE_NAME} Image to version ${BUILD_NUMBER}"
                             git push https://${git_token}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
                         '''
                     }
@@ -179,7 +184,7 @@ pipeline {
                         to: 'hichamazroual2002@gmail.com',
                         from: 'hichamazroual2002@gmail.com',
                         mimeType: 'text/html',
-                        attachmentsPattern: 'dependency-check-report.xml,trivy-fs-report.txt,trivy-image-cart.json,trivy-image-cart.txt'
+                        attachmentsPattern: 'dependency-check-report.xml,trivy-fs-report.txt,trivy-image-${SERVICE_NAME}.json,trivy-image-${SERVICE_NAME}.txt'
                     )
                 }
             }
