@@ -175,7 +175,6 @@ stage("Trivy Scan Image") {
                         subject: "Pipeline ${buildStatus}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                         body: """
                             <p>Cartservice Google-Shop DevSecOps pipeline status.</p>
-                            <p>Youtube Link :- https://www.youtube.com/@devopsHarishNShetty </p>
                             <p>Project: ${env.JOB_NAME}</p>
                             <p>Build Number: ${env.BUILD_NUMBER}</p>
                             <p>Build Status: ${buildStatus}</p>
